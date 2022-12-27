@@ -1,2 +1,7 @@
-package note.utils.exceptions;public class NoteNoteFound {
+package note.utils.exceptions;
+
+public class NoteNoteFound extends  RuntimeException{
+    public NoteNoteFound(String message){
+        super(message);
+    }
 }

@@ -1,2 +1,7 @@
-package note.utils.exceptions;public class InvalidInput {
+package note.utils.exceptions;
+
+public class InvalidInput extends RuntimeException {
+    public InvalidInput(String message){
+        super(message);
+    }
 }

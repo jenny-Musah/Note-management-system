@@ -1,4 +1,4 @@
-package user_services_test;
+package note;
 
 import note.services.userServices.UserServices;
 import org.junit.jupiter.api.Test;

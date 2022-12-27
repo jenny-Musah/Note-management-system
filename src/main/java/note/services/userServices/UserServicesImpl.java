@@ -1,13 +1,19 @@
-package note.services;
+package note.services.userServices;
 
-import note.data.dto.request.UserLogInRequest;
-import note.data.dto.request.UserSignUpRequest;
+import note.data.dto.request.user_requests.UserLogInRequest;
+import note.data.dto.request.user_requests.UserSignUpRequest;
+import note.data.models.Note;
 import note.data.models.User;
 import note.data.repository.UserRepository;
 import note.utils.exceptions.InvalidInput;
+import note.utils.exceptions.UserNotfound;
 import note.utils.validations.UserSignUpValidation;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class UserServicesImpl implements UserServices {
@@ -36,7 +42,9 @@ public class UserServicesImpl implements UserServices {
         user.setLastName(userSignUpRequest.getLastName());
         user.setFirstName(userSignUpRequest.getFirstName());
         user.setEmail(userSignUpRequest.getEmail());
-        user.setPassword(userSignUpRequest.getPassword());
+        String password = BCrypt.hashpw(userSignUpRequest.getPassword(),BCrypt.gensalt());
+        System.out.println(password);
+        user.setPassword(password);
         return userRepository.save(user);
     }
 
@@ -44,11 +52,49 @@ public class UserServicesImpl implements UserServices {
     public String login(UserLogInRequest userLogInRequest) {
         User savedUser = userRepository.findByEmail(userLogInRequest.getEmail());
         if(savedUser != null){
-            if(userLogInRequest.getPassword().matches(savedUser.getPassword())){
+            if(BCrypt.checkpw(userLogInRequest.getPassword(),savedUser.getPassword())){
              return String.format("Welcome back, %s",savedUser.getFirstName());
             }
         }
         return "Unrecognized email or Password";
     }
+
+    @Override
+    public void addNote(Note note, String userId) {
+        User user = userRepository.findUserById(userId);
+        if(user == null)throw new UserNotfound("User not found");
+        user.getNotes().add(note);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void deleteFromUserList(String noteId, String userId){
+        User user = userRepository.findUserById(userId);
+        if(user == null) throw new UserNotfound("User not found");
+        user.getNotes().removeIf(note -> Objects.equals(note.getId(), noteId));
+        userRepository.save(user);
+    }
+    @Override
+    public void deleteAllNotes(String userId) {
+        User user = userRepository.findUserById(userId);
+        if(user == null) throw new UserNotfound("User not found");
+        user.getNotes().clear();
+        userRepository.save(user);
+    }
+
+    @Override
+    public void deleteAccount(String userId) {
+        User user = userRepository.findUserById(userId);
+        if(user == null) throw new UserNotfound("User not found");
+        userRepository.delete(user);
+    }
+
+    @Override
+    public List<Note> userNoteList(String userId){
+        User user = userRepository.findUserById(userId);
+        if(user == null) throw new UserNotfound("User not found");
+        return user.getNotes();
+    }
+
 
 }

@@ -1,4 +1,4 @@
-package note.data.dto.request;
+package note.data.dto.request.user_requests;
 
 import lombok.Data;
 import note.data.models.Note;
