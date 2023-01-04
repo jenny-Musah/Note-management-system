@@ -5,7 +5,7 @@ import note.data.dto.response.NoteViewResponse;
 import note.data.models.Note;
 import note.data.repository.NoteRepository;
 import note.services.userServices.UserServices;
-import note.utils.exceptions.NoteNoteFound;
+import note.utils.exceptions.exceptionClass.NoteNoteFound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +33,7 @@ public class NoteServicesImpl implements NoteService{
     @Override
     public void deleteNoteById(String noteId, String userId) {
         Note note = noteRepository.findNoteById(noteId);
-        if(note == null) throw  new NoteNoteFound("Note does not exist");
+        if(note == null) throw  new NoteNoteFound();
         noteRepository.delete(note);
         userServices.deleteFromUserList(noteId,userId);
     }
@@ -63,7 +63,7 @@ public class NoteServicesImpl implements NoteService{
     public NoteViewResponse viewNoteById(String noteId) {
         NoteViewResponse noteViewResponse = new NoteViewResponse();
         Note note = noteRepository.findNoteById(noteId);
-        if(note == null) throw  new NoteNoteFound("Note does not exist");
+        if(note == null) throw  new NoteNoteFound();
         noteViewResponse.setTitle(note.getTitle());
         noteViewResponse.setBody(note.getBody());
         noteViewResponse.setDate(note.getDate());
@@ -73,7 +73,7 @@ public class NoteServicesImpl implements NoteService{
     @Override
     public void updateNote(String noteId, AddNoteRequest addNoteRequest) {
         Note note = noteRepository.findNoteById(noteId);
-        if(note == null) throw  new NoteNoteFound("Note does not exist");
+        if(note == null) throw  new NoteNoteFound();
         note.setBody(addNoteRequest.getBody());
         note.setTitle(addNoteRequest.getTitle());
         noteRepository.save(note);

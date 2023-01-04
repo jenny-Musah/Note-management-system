@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     @Autowired
-    UserServices userServices;
+   private UserServices userServices;
 
     @PostMapping("/sign_up")
     public String signUp(@RequestBody UserSignUpRequest userSignUpRequest){
@@ -22,7 +22,7 @@ public class UserController {
     public String login(@RequestBody UserLogInRequest userLogInRequest){
         return userServices.login(userLogInRequest);
     }
-    //Working to this point
+
     @DeleteMapping("/delete_account/{userId}")
     public String deleteUser(@PathVariable String userId){
         userServices.deleteAccount(userId);
