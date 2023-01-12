@@ -4,6 +4,8 @@ import note.data.dto.request.user_requests.UserLogInRequest;
 import note.data.dto.request.user_requests.UserSignUpRequest;
 import note.services.userServices.UserServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -15,17 +17,16 @@ public class UserController {
    private UserServices userServices;
 
     @PostMapping("/sign_up")
-    public String signUp(@RequestBody UserSignUpRequest userSignUpRequest){
-       return userServices.signUp(userSignUpRequest);
+    public ResponseEntity<?> signUp(@RequestBody UserSignUpRequest userSignUpRequest){
+       return  new ResponseEntity<>(userServices.signUp(userSignUpRequest), HttpStatus.OK);
     }
     @PostMapping("/login")
-    public String login(@RequestBody UserLogInRequest userLogInRequest){
-        return userServices.login(userLogInRequest);
+    public ResponseEntity<?> login(@RequestBody UserLogInRequest userLogInRequest){
+        return new ResponseEntity<>(userServices.login(userLogInRequest), HttpStatus.OK);
     }
-
     @DeleteMapping("/delete_account/{userId}")
-    public String deleteUser(@PathVariable String userId){
+    public ResponseEntity<?> deleteUser(@PathVariable String userId){
         userServices.deleteAccount(userId);
-        return "Account deleted";
+        return new ResponseEntity<>("Account deleted", HttpStatus.OK);
     }
 }

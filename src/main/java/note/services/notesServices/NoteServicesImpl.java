@@ -1,6 +1,7 @@
 package note.services.notesServices;
 
 import note.data.dto.request.note_requests.AddNoteRequest;
+import note.data.dto.request.note_requests.FindNoteRequest;
 import note.data.dto.response.NoteViewResponse;
 import note.data.models.Note;
 import note.data.repository.NoteRepository;
@@ -33,7 +34,7 @@ public class NoteServicesImpl implements NoteService{
     @Override
     public void deleteNoteById(String noteId, String userId) {
         Note note = noteRepository.findNoteById(noteId);
-        if(note == null) throw  new NoteNoteFound();
+        if(note == null) throw  new NoteNoteFound("Note not found");
         noteRepository.delete(note);
         userServices.deleteFromUserList(noteId,userId);
     }
@@ -63,7 +64,7 @@ public class NoteServicesImpl implements NoteService{
     public NoteViewResponse viewNoteById(String noteId) {
         NoteViewResponse noteViewResponse = new NoteViewResponse();
         Note note = noteRepository.findNoteById(noteId);
-        if(note == null) throw  new NoteNoteFound();
+        if(note == null) throw  new NoteNoteFound("Note not found");
         noteViewResponse.setTitle(note.getTitle());
         noteViewResponse.setBody(note.getBody());
         noteViewResponse.setDate(note.getDate());
@@ -73,10 +74,24 @@ public class NoteServicesImpl implements NoteService{
     @Override
     public void updateNote(String noteId, AddNoteRequest addNoteRequest) {
         Note note = noteRepository.findNoteById(noteId);
-        if(note == null) throw  new NoteNoteFound();
+        if(note == null) throw  new NoteNoteFound("Note not found");
         note.setBody(addNoteRequest.getBody());
         note.setTitle(addNoteRequest.getTitle());
         noteRepository.save(note);
+    }
+
+    @Override
+    public NoteViewResponse searchForNote(FindNoteRequest findNoteRequest, String userId) {
+        for(Note note: noteRepository.findAll()){
+            if(note.getTitle().equalsIgnoreCase(findNoteRequest.getListName()) && Objects.equals(note.getUserId(), userId)){
+                NoteViewResponse noteViewResponse = new NoteViewResponse();
+                noteViewResponse.setDate(note.getDate());
+                noteViewResponse.setTitle(note.getTitle());
+                noteViewResponse.setBody(note.getBody());
+                return noteViewResponse;
+            }
+        }
+        throw new NoteNoteFound("Note does not exist");
     }
 
 }

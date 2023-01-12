@@ -31,11 +31,11 @@ public class UserServicesImpl implements UserServices {
 
     private void validateSignUpRequest(UserSignUpRequest userSignUpRequest) {
         User alreadyExist = userRepository.findByEmail(userSignUpRequest.getEmail());
-        if(alreadyExist != null) throw new InvalidInput();
-        if(!UserSignUpValidation.isValidNames(userSignUpRequest.getFirstName())) throw new InvalidInput();
-        if(!UserSignUpValidation.isValidNames(userSignUpRequest.getLastName()))throw new InvalidInput();
-        if(!UserSignUpValidation.isValidEmailAddress(userSignUpRequest.getEmail())) throw new InvalidInput();
-        if(!UserSignUpValidation.isValidPassword(userSignUpRequest.getPassword())) throw new InvalidInput();
+        if(alreadyExist != null) throw new InvalidInput("User with this email already exist");
+        if(!UserSignUpValidation.isValidNames(userSignUpRequest.getFirstName())) throw new InvalidInput("Invalid name format begin with capital letter");
+        if(!UserSignUpValidation.isValidNames(userSignUpRequest.getLastName()))throw new InvalidInput("Invalid name format begin with capital letter");
+        if(!UserSignUpValidation.isValidEmailAddress(userSignUpRequest.getEmail())) throw new InvalidInput("Invalid email address");
+        if(!UserSignUpValidation.isValidPassword(userSignUpRequest.getPassword())) throw new InvalidInput("Wrong password format must include capital letter, small letter, special characters and numbers");
     }
     private User createUser(UserSignUpRequest userSignUpRequest){
         User user = new User();
@@ -43,7 +43,6 @@ public class UserServicesImpl implements UserServices {
         user.setFirstName(userSignUpRequest.getFirstName());
         user.setEmail(userSignUpRequest.getEmail());
         String password = BCrypt.hashpw(userSignUpRequest.getPassword(),BCrypt.gensalt());
-        System.out.println(password);
         user.setPassword(password);
         return userRepository.save(user);
     }
@@ -62,7 +61,7 @@ public class UserServicesImpl implements UserServices {
     @Override
     public void addNote(Note note, String userId) {
         User user = userRepository.findUserById(userId);
-        if(user == null)throw new UserNotfound();
+        if(user == null)throw new UserNotfound("User with this id does not exist");
         user.getNotes().add(note);
         userRepository.save(user);
     }
@@ -70,14 +69,14 @@ public class UserServicesImpl implements UserServices {
     @Override
     public void deleteFromUserList(String noteId, String userId){
         User user = userRepository.findUserById(userId);
-        if(user == null) throw new UserNotfound();
+        if(user == null) throw new UserNotfound("User with this id does not exist");
         user.getNotes().removeIf(note -> Objects.equals(note.getId(), noteId));
         userRepository.save(user);
     }
     @Override
     public void deleteAllNotes(String userId) {
         User user = userRepository.findUserById(userId);
-        if(user == null) throw new UserNotfound();
+        if(user == null) throw new UserNotfound("User with this id does not exist");
         user.getNotes().clear();
         userRepository.save(user);
     }
@@ -85,14 +84,14 @@ public class UserServicesImpl implements UserServices {
     @Override
     public void deleteAccount(String userId) {
         User user = userRepository.findUserById(userId);
-        if(user == null) throw new UserNotfound();
+        if(user == null) throw new UserNotfound("User with this id does not exist");
         userRepository.delete(user);
     }
 
     @Override
     public List<Note> userNoteList(String userId){
         User user = userRepository.findUserById(userId);
-        if(user == null) throw new UserNotfound();
+        if(user == null) throw new UserNotfound("User with this id does not exist");
         return user.getNotes();
     }
 

@@ -1,12 +1,13 @@
 package note.controller;
 
 import note.data.dto.request.note_requests.AddNoteRequest;
-import note.data.dto.response.NoteViewResponse;
+import note.data.dto.request.note_requests.FindNoteRequest;
 import note.services.notesServices.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -15,40 +16,39 @@ public class NoteController {
     private NoteService noteService;
 
     @PostMapping("/add_note/{userId}")
-    public String addNote(@RequestBody AddNoteRequest addNoteRequest, @PathVariable String userId){
+    public ResponseEntity<?> addNote(@RequestBody AddNoteRequest addNoteRequest, @PathVariable String userId){
         noteService.createNote(addNoteRequest, userId);
-        return "Note added Successfully!";
+        return  new ResponseEntity<>("Note added Successfully!", HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{noteId}/{userId}")
-    public String deleteNoteById(@PathVariable String noteId, @PathVariable String userId){
+    public ResponseEntity<?> deleteNoteById(@PathVariable String noteId, @PathVariable String userId){
         noteService.deleteNoteById(noteId,userId);
-        return "Note deleted successfully";
+        return new ResponseEntity<>("Note deleted successfully", HttpStatus.OK);
     }
     @DeleteMapping("/delete_all/{userId}")
-    public String deleteAllNote(@PathVariable String userId){
+    public ResponseEntity<?> deleteAllNote(@PathVariable String userId){
         noteService.deleteAllNotes(userId);
-        return "All notes deleted successfully";
+        return new ResponseEntity<>("Note deleted successfully",HttpStatus.OK);
     }
 
     @GetMapping("/notes/{userId}")
-    public List<NoteViewResponse> viewAllNote(@PathVariable String userId){
-        return noteService.viewAllNotes(userId);
+    public ResponseEntity<?> viewAllNote(@PathVariable String userId){
+        return new ResponseEntity<>(noteService.viewAllNotes(userId), HttpStatus.OK);
     }
 
     @GetMapping("/note/{id}")
-    public NoteViewResponse viewNote(@PathVariable String id){
-        return noteService.viewNoteById(id);
+    public ResponseEntity<?> viewNote(@PathVariable String id){
+        return new ResponseEntity<>(noteService.viewNoteById(id), HttpStatus.OK);
     }
 
     @PostMapping("/update/{noteId}")
-    public String updateNote(@RequestBody AddNoteRequest addNoteRequest, @PathVariable String noteId){
+    public ResponseEntity<?> updateNote(@RequestBody AddNoteRequest addNoteRequest, @PathVariable String noteId){
         noteService.updateNote(noteId,addNoteRequest);
-        return "Note update successful";
+        return new ResponseEntity<>("Note update successful", HttpStatus.OK);
     }
-    @GetMapping("/")
-    public String test(){
-        return "This is Spring";
+    @PostMapping("/search/{userId}")
+    public ResponseEntity<?> searchForNote(@RequestBody FindNoteRequest findNoteRequest, @PathVariable String userId){
+       return new ResponseEntity<>(noteService.searchForNote(findNoteRequest,userId), HttpStatus.OK);
     }
-
 }
