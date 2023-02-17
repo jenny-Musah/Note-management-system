@@ -7,7 +7,7 @@ phases:
   pre_build:
     commands:
       - echo Pre_build Phase
-      - npm install
+#       - npm install
   build:
     commands:
       - echo Build Phase
